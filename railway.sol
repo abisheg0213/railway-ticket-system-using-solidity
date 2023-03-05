@@ -2,6 +2,7 @@ pragma solidity ^0.8.14;
 contract railway
 {
     uint ticket_id=1020;
+    uint refund_id=1;
     uint [20] nonac;
     uint [15] ac;
     uint public totalincome;
@@ -19,7 +20,14 @@ contract railway
         uint total_amount_spend;
         uint time;
     }
+    struct refund
+    {
+        uint t_id;
+        uint refund_amount;
+        uint time;
+    }
     mapping(uint => ticket_booked) public tb;
+     mapping(uint => refund) public refunds;
     function setval() private{
         for(uint i=0;i<20;i++)
         {
@@ -138,6 +146,27 @@ contract railway
             tb[ticket_id]=(ticket_booked(msg.sender,c,btk,no*ac_rate,block.timestamp));
             ticket_id++;
             ac_avail-=no;
+        }
+    }
+    function cancel_ticket(uint id,uint c) public
+    {
+        uint tp=tb[id].total_amount_spend;
+        uint am=tp-225;
+        refunds[refund_id]=refund(id,am,block.timestamp);
+        totalincome=totalincome-am;
+        if(c==101)
+        {
+        for(uint i=0;i<tb[id].seat_no.length;i++)
+        {
+            ac[tb[id].seat_no[i]]=0;
+        }
+        }
+        if(c==102)
+        {
+        for(uint i=0;i<tb[id].seat_no.length;i++)
+        {
+            nonac[tb[id].seat_no[i]]=0;
+        }
         }
     }
 }
